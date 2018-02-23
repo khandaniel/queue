@@ -10,8 +10,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class SendResetLink extends Notification implements ShouldQueue
 {
-    use Notifiable;
     use Queueable;
+    use Notifiable;
 
     public $token;
     public static $toMailCallback;
@@ -23,6 +23,10 @@ class SendResetLink extends Notification implements ShouldQueue
     public function __construct($token)
     {
         $this->token = $token;
+    }
+
+    public function sendLink($user) {
+        $user->notify(new SendResetLink($this->token));
     }
 
     /**
@@ -50,8 +54,7 @@ class SendResetLink extends Notification implements ShouldQueue
         return (new MailMessage)
             ->line('You are receiving this email because we received a password reset request for your account.')
             ->action('Reset Password', url(config('app.url').route('password.reset', $this->token, false)))
-            ->line('If you did not request a password reset, no further action is required.')
-            ->line('This message is custom.');
+            ->line('If you did not request a password reset, no further action is required.');
     }
 
     /**
